@@ -4,7 +4,6 @@ import com.anuththara.jobhunttracker.company.dto.CompanyRequest;
 import com.anuththara.jobhunttracker.company.dto.CompanyResponse;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -63,7 +62,7 @@ public class CompanyService {
 
         private Company findCompanyOrThrow(Long id) {
             return companyRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Company not found with id: " + id));
+                    .orElseThrow(() -> new CompanyNotFoundException(id));
         }
 
         private CompanyResponse mapToResponse(Company company) {
