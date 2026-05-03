@@ -43,7 +43,30 @@ public class CompanyService {
         return mapToResponse(company);
     }
 
+    public CompanyResponse updateCompany(Long id, CompanyRequest request) {
 
+        Company company = findCompanyOrThrow(id);
+
+        company.setName(request.name());
+        company.setIndustry(request.industry());
+        company.setWebsite(request.website());
+        company.setLocation(request.location());
+        company.setNotes(request.notes());
+
+        return mapToResponse(company);
+    }
+
+    public void deleteCompany(Long id) {
+        Company company = findCompanyOrThrow(id);
+        companies.remove(company);
+    }
+
+    private Company findCompanyOrThrow(Long id) {
+        return companies.stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+    }
 
     private CompanyResponse mapToResponse(Company company) {
         return CompanyResponse.builder()

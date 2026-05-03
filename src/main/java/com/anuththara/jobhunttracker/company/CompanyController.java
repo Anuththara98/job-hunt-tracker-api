@@ -33,4 +33,17 @@ public class CompanyController {
     public CompanyResponse getCompanyById(@PathVariable Long id) {
         return companyService.getCompanyById(id);
     }
+
+    @PutMapping("/{id}")
+    public CompanyResponse updateCompany(
+            @PathVariable Long id,
+            @RequestBody CompanyRequest request) {
+        return companyService.updateCompany(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCompany(@PathVariable Long id) {
+        companyService.deleteCompany(id);
+    }
 }
