@@ -1,16 +1,20 @@
 package com.anuththara.jobhunttracker.common.exception;
 
 import com.anuththara.jobhunttracker.company.CompanyNotFoundException;
+import com.anuththara.jobhunttracker.company.dto.CompanyRequest;
+import com.anuththara.jobhunttracker.company.dto.CompanyResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(CompanyNotFoundException.class)
