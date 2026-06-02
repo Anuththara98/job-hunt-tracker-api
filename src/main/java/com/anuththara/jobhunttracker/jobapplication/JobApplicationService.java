@@ -4,6 +4,8 @@ import com.anuththara.jobhunttracker.company.Company;
 import com.anuththara.jobhunttracker.company.CompanyService;
 import com.anuththara.jobhunttracker.jobapplication.dto.JobApplicationRequest;
 import com.anuththara.jobhunttracker.jobapplication.dto.JobApplicationResponse;
+import com.anuththara.jobhunttracker.security.SecurityUtils;
+import com.anuththara.jobhunttracker.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +25,8 @@ public class JobApplicationService {
 
     @Transactional
     public JobApplicationResponse create(JobApplicationRequest request) {
-        Company company = companyService.getCompanyEntityById(request.companyId());
+        User currentUser = SecurityUtils.getCurrentUser();
+        Company company = companyService.getCompanyEntityById(request.companyId(), currentUser);
 
         JobApplication job = JobApplication.builder()
                 .jobTitle(request.jobTitle())
@@ -35,16 +38,16 @@ public class JobApplicationService {
                 .closingDate(request.closingDate())
                 .notes(request.notes())
                 .company(company)
+                .owner(currentUser)
                 .build();
 
-        JobApplication saved = jobRepository.save(job);
-
-        return mapToResponse(saved);
+        return mapToResponse(jobRepository.save(job));
     }
 
     @Transactional(readOnly = true)
     public List<JobApplicationResponse> getAll() {
-        return jobRepository.findAll()
+        User currentUser = SecurityUtils.getCurrentUser();
+        return jobRepository.findAllByOwner(currentUser)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -52,7 +55,8 @@ public class JobApplicationService {
 
     @Transactional(readOnly = true)
     public List<JobApplicationResponse> getByCompany(Long companyId) {
-        return jobRepository.findByCompanyId(companyId)
+        User currentUser = SecurityUtils.getCurrentUser();
+        return jobRepository.findByCompanyIdAndOwner(companyId, currentUser)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -60,12 +64,14 @@ public class JobApplicationService {
 
     @Transactional(readOnly = true)
     public JobApplicationResponse getById(Long id) {
-        return mapToResponse(findOrThrow(id));
+        User currentUser = SecurityUtils.getCurrentUser();
+        return mapToResponse(findOrThrow(id, currentUser));
     }
 
     @Transactional
     public JobApplicationResponse update(Long id, JobApplicationRequest request) {
-        JobApplication job = findOrThrow(id);
+        User currentUser = SecurityUtils.getCurrentUser();
+        JobApplication job = findOrThrow(id, currentUser);
 
         job.setJobTitle(request.jobTitle());
         job.setJobLink(request.jobLink());
@@ -76,19 +82,17 @@ public class JobApplicationService {
         job.setClosingDate(request.closingDate());
         job.setNotes(request.notes());
 
-        JobApplication updated = jobRepository.save(job);
-
-        return mapToResponse(updated);
+        return mapToResponse(jobRepository.save(job));
     }
 
     @Transactional
     public void delete(Long id) {
-        JobApplication job = findOrThrow(id);
-        jobRepository.delete(job);
+        User currentUser = SecurityUtils.getCurrentUser();
+        jobRepository.delete(findOrThrow(id, currentUser));
     }
 
-    private JobApplication findOrThrow(Long id) {
-        return jobRepository.findById(id)
+    private JobApplication findOrThrow(Long id, User owner) {
+        return jobRepository.findByIdAndOwner(id, owner)
                 .orElseThrow(() -> new JobApplicationNotFoundException(id));
     }
 

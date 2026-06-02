@@ -1,5 +1,6 @@
 package com.anuththara.jobhunttracker.company;
 
+import com.anuththara.jobhunttracker.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -34,6 +35,10 @@ public class Company {
 
     @Column(length = 1000)
     private String notes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

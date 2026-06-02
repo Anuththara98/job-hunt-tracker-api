@@ -1,6 +1,7 @@
 package com.anuththara.jobhunttracker.jobapplication;
 
 import com.anuththara.jobhunttracker.company.Company;
+import com.anuththara.jobhunttracker.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -47,6 +48,10 @@ public class JobApplication {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

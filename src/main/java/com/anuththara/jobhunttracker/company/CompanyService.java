@@ -2,6 +2,8 @@ package com.anuththara.jobhunttracker.company;
 
 import com.anuththara.jobhunttracker.company.dto.CompanyRequest;
 import com.anuththara.jobhunttracker.company.dto.CompanyResponse;
+import com.anuththara.jobhunttracker.security.SecurityUtils;
+import com.anuththara.jobhunttracker.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,22 +20,23 @@ public class CompanyService {
 
     @Transactional
     public CompanyResponse createCompany(CompanyRequest request) {
+        User currentUser = SecurityUtils.getCurrentUser();
         Company company = Company.builder()
                 .name(request.name())
                 .industry(request.industry())
                 .website(request.website())
                 .location(request.location())
                 .notes(request.notes())
+                .owner(currentUser)
                 .build();
 
-        Company savedCompany = companyRepository.save(company);
-
-        return mapToResponse(savedCompany);
+        return mapToResponse(companyRepository.save(company));
     }
 
     @Transactional(readOnly = true)
     public List<CompanyResponse> getAllCompanies() {
-        return companyRepository.findAll()
+        User currentUser = SecurityUtils.getCurrentUser();
+        return companyRepository.findAllByOwner(currentUser)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -41,12 +44,14 @@ public class CompanyService {
 
     @Transactional(readOnly = true)
     public CompanyResponse getCompanyById(Long id) {
-        return mapToResponse(getCompanyEntityById(id));
+        User currentUser = SecurityUtils.getCurrentUser();
+        return mapToResponse(getCompanyEntityById(id, currentUser));
     }
 
     @Transactional
     public CompanyResponse updateCompany(Long id, CompanyRequest request) {
-        Company company = getCompanyEntityById(id);
+        User currentUser = SecurityUtils.getCurrentUser();
+        Company company = getCompanyEntityById(id, currentUser);
 
         company.setName(request.name());
         company.setIndustry(request.industry());
@@ -54,19 +59,17 @@ public class CompanyService {
         company.setLocation(request.location());
         company.setNotes(request.notes());
 
-        Company updatedCompany = companyRepository.save(company);
-
-        return mapToResponse(updatedCompany);
+        return mapToResponse(companyRepository.save(company));
     }
 
     @Transactional
     public void deleteCompany(Long id) {
-        Company company = getCompanyEntityById(id);
-        companyRepository.delete(company);
+        User currentUser = SecurityUtils.getCurrentUser();
+        companyRepository.delete(getCompanyEntityById(id, currentUser));
     }
 
-    public Company getCompanyEntityById(Long id) {
-        return companyRepository.findById(id)
+    public Company getCompanyEntityById(Long id, User owner) {
+        return companyRepository.findByIdAndOwner(id, owner)
                 .orElseThrow(() -> new CompanyNotFoundException(id));
     }
 
