@@ -2,6 +2,7 @@ package com.anuththara.jobhunttracker.common.exception;
 
 import com.anuththara.jobhunttracker.auth.EmailAlreadyExistsException;
 import com.anuththara.jobhunttracker.company.CompanyNotFoundException;
+import com.anuththara.jobhunttracker.coverletter.CoverLetterGenerationException;
 import com.anuththara.jobhunttracker.jobapplication.JobApplicationNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -50,6 +51,23 @@ public class GlobalExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(CoverLetterGenerationException.class)
+    public ResponseEntity<ErrorResponse> handleCoverLetterGenerationException(
+            CoverLetterGenerationException ex, HttpServletRequest request) {
+
+        log.error("Cover letter generation failed: {}", ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_GATEWAY.value())
+                .error("Bad Gateway")
+                .message("Failed to generate cover letter. Please try again.")
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_GATEWAY);
     }
 
     @ExceptionHandler(AuthenticationException.class)
