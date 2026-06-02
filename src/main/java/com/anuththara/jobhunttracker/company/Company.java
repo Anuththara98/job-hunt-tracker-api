@@ -2,6 +2,10 @@ package com.anuththara.jobhunttracker.company;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "companies")
@@ -31,5 +35,9 @@ public class Company {
     @Column(length = 1000)
     private String notes;
 
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

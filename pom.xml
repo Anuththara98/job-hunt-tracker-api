@@ -11,8 +11,8 @@
 	<groupId>com.anuththara</groupId>
 	<artifactId>job-hunt-tracker-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>Job Hunt Tracker API</name>
+	<description>Portfolio-grade REST API for tracking job applications, with AI cover letter generation</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -42,11 +42,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web-services</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>

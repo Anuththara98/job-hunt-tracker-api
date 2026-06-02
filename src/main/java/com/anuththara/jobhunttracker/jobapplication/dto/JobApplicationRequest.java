@@ -4,6 +4,7 @@ import com.anuththara.jobhunttracker.jobapplication.JobApplicationStatus;
 import com.anuththara.jobhunttracker.jobapplication.WorkType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
@@ -23,10 +24,13 @@ public record JobApplicationRequest(
         @Size(max = 100, message = "Location must be less than 100 characters")
         String location,
 
+        @NotNull(message = "Work type is required")
         WorkType workType,
 
+        @NotNull(message = "Status is required")
         JobApplicationStatus status,
 
+        @PastOrPresent(message = "Applied date cannot be in the future")
         LocalDate appliedDate,
 
         LocalDate closingDate,

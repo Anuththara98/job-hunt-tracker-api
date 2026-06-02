@@ -1,8 +1,7 @@
 package com.anuththara.jobhunttracker.jobapplication;
 
 import com.anuththara.jobhunttracker.company.Company;
-import com.anuththara.jobhunttracker.company.CompanyNotFoundException;
-import com.anuththara.jobhunttracker.company.CompanyRepository;
+import com.anuththara.jobhunttracker.company.CompanyService;
 import com.anuththara.jobhunttracker.jobapplication.dto.JobApplicationRequest;
 import com.anuththara.jobhunttracker.jobapplication.dto.JobApplicationResponse;
 import org.springframework.stereotype.Service;
@@ -14,19 +13,17 @@ import java.util.List;
 public class JobApplicationService {
 
     private final JobApplicationRepository jobRepository;
-    private final CompanyRepository companyRepository;
+    private final CompanyService companyService;
 
     public JobApplicationService(JobApplicationRepository jobRepository,
-                                 CompanyRepository companyRepository) {
+                                 CompanyService companyService) {
         this.jobRepository = jobRepository;
-        this.companyRepository = companyRepository;
+        this.companyService = companyService;
     }
 
     @Transactional
     public JobApplicationResponse create(JobApplicationRequest request) {
-
-        Company company = companyRepository.findById(request.companyId())
-                .orElseThrow(() -> new CompanyNotFoundException(request.companyId()));
+        Company company = companyService.getCompanyEntityById(request.companyId());
 
         JobApplication job = JobApplication.builder()
                 .jobTitle(request.jobTitle())
@@ -68,7 +65,6 @@ public class JobApplicationService {
 
     @Transactional
     public JobApplicationResponse update(Long id, JobApplicationRequest request) {
-
         JobApplication job = findOrThrow(id);
 
         job.setJobTitle(request.jobTitle());
@@ -93,7 +89,7 @@ public class JobApplicationService {
 
     private JobApplication findOrThrow(Long id) {
         return jobRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Job application not found with id: " + id));
+                .orElseThrow(() -> new JobApplicationNotFoundException(id));
     }
 
     private JobApplicationResponse mapToResponse(JobApplication job) {
